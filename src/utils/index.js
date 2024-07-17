@@ -1,9 +1,11 @@
+import { createClient } from "@supabase/supabase-js";
+
 export const puestos = [
-    'Profesor de Tiempo Completo Titular A',
-    'Profesor de Tiempo Completo Titular B',
-    'Profesor de Tiempo Completo Asociado A',
-    'Profesor de Tiempo Completo Asociado B',
-    'Profesor de Tiempo Completo Asociado C',
+    'Profesor de Tiempo Completo Titular "A"',
+    'Profesor de Tiempo Completo Titular "B"',
+    'Profesor de Tiempo Completo Asociado "A"',
+    'Profesor de Tiempo Completo Asociado "B"',
+    'Profesor de Tiempo Completo Asociado "C"',
     'Profesor por asignatura B',
     'Técnico Académico',
 ]
@@ -149,9 +151,7 @@ export const defaultRecord = {
     no: 0,
     nt: 0,
     titulo: "",
-    apellido_paterno: "",
-    apellido_materno: "",
-    nombres: "",
+    nombre: "",
     sexo: "",
     puesto: "",
     actividades: [
@@ -183,3 +183,8 @@ export const generatePeriods = (year, ordinario) => {
         return generateFormat(month1, month2)
     })
 }
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
