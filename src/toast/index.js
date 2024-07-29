@@ -1,5 +1,4 @@
 import { CircularProgress } from '@nextui-org/react'
-import { useTheme } from 'next-themes'
 import React from 'react'
 import { Toaster, useToaster } from 'react-hot-toast'
 
@@ -9,8 +8,8 @@ export default function Notify() {
         <div onMouseEnter={startPause} onMouseLeave={endPause} >
             <Toaster position='top-right' toastOptions={{
                 style: {
-                    backgroundColor: 'background',
-                    color: 'revert',
+                    backgroundColor: '#18181b',
+                    color: '#f3f4f6',
                     boxShadow: '0 1px 5px #09090b',
                     overflow: 'hidden',
                 }, icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">

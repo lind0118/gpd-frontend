@@ -1,10 +1,5 @@
+import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
-
-export const promiseResolver = async (promiseList) => {
-    const results = await Promise.allSettled(promiseList)
-    const data = results.map(r => r.value)
-    return data
-}
 
 export const puestos = [
     'Profesor de Tiempo Completo Titular "A"',
@@ -26,10 +21,11 @@ export const titulos = [
 
 export const distribucionActividades = [
     'Docencia',
-    'LIIAD',
-    'Tutorías',
-    'Gestión',
-    'Estadía técnica',
+    'Atención a estudiantes',
+    'Atención personalizada',
+    'Gestión Institucional',
+    'Desarrollo de material',
+    'LIIAD'
 ]
 
 export const modalidades = [
@@ -40,13 +36,13 @@ export const modalidades = [
     'Ingeniería Escolarizada',
     'Ingeniería Mixta',
 ]
-export const defaultActivity = {
+export const defaultActivity = {    
     id: crypto.randomUUID(),
-    pe: null,
+    pe: {
+        siglas: "",
+        descripcion: "",
+    },
     distribucion_actividades: "",
-    tipo_gestion: "",
-    tipo_estadia: "",
-    numero_estudiantes: 0,
     nombre_actividades: "",
     grados_grupos: [],
     horas_semanales: 0,
@@ -58,8 +54,6 @@ export const defaultRecord = {
     nombre: "",
     sexo: "",
     puesto: "",
-    anio: new Date().getFullYear(),
-    periodo: "",
     actividades: [
         defaultActivity
     ],
