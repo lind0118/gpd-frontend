@@ -1,6 +1,6 @@
 import { StoredContext } from "@/context"
-import { supabase } from "@/utils"
-import { Button, Chip, Input, Select, SelectItem, SelectSection, Switch } from "@nextui-org/react"
+import { getOneAcademicWorker } from "@/models/transactions"
+import { Chip, Input, Select, SelectItem, SelectSection, Switch } from "@nextui-org/react"
 import { useState } from "react"
 import toast from "react-hot-toast"
 
@@ -10,11 +10,7 @@ export const NtInput = ({ academicWorkers }) => {
     const [locked, setLocked] = useState(false)
     const [selectorActive, setSelectorActive] = useState(false)
     const handleChangeFromSupabase = async (newValue) => {
-        const supaPromise = supabase.from('dpersonales').select('ide,nombre,puesto,area').eq('ide', newValue).ilikeAnyOf('puesto', [
-            '%asignatura%',
-            '%Tiempo Completo%',
-            '%de Apoyo%',
-        ])
+        const supaPromise = getOneAcademicWorker(newValue)
         if (newValue === '') return
         toast.promise(supaPromise, {
             loading: 'Buscando número de trabajador',
@@ -24,7 +20,7 @@ export const NtInput = ({ academicWorkers }) => {
                 }
                 if (data.length > 0) {
                     setIdError(false)
-                    setStored({ record: { ...record, nt: data[0].ide, puesto: data[0].puesto, nombres: data[0].nombre } })
+                    setStored({ record: { ...record, nt: data[0].ide, puesto: data[0].puesto, nombre: data[0].nombre } })
                     setLocked(true)
                     return 'Número de trabajador encontrado'
                 } else {
@@ -62,7 +58,7 @@ export const NtInput = ({ academicWorkers }) => {
                             </SelectSection>
                             <SelectSection title="Lengua Inglesa">
                                 {
-                                    academicWorkers.filter(w => w.area === 'P.E. de Lengua Inglesa' || w.area === 'P.E. de Lengua inglesa').map(w => {
+                                    academicWorkers.filter(w => w.area === 'P.E. de Lengua Inglesa').map(w => {
                                         return <SelectItem key={w.ide} variant="flat" endContent={<p className="text-utim">{w.ide}</p>}>{w.nombre}</SelectItem>
                                     })
                                 }
