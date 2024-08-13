@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id                  BigInt       @id @default(autoincrement())
+  email               String       @unique @db.VarChar(120)
+  password            String       @db.VarChar(120)
+  nt                  Int          @unique
+  active              Boolean      @default(true)
+  personalData        PersonalData @relation(fields: [nt], references: [ide])
+  templateResponsible Template[]   @relation("responsable")
+  templateRevisedBy   Template[]   @relation("Revisado por")
+
+  @@unique([id, nt])
+}
+
+model PersonalData {
+  id                BigInt            @id @unique @default(autoincrement())
+  ide               Int               @unique @db.Integer
+  name              String?           @db.VarChar(60)
+  position          String?           @db.VarChar(100)
+  area              String?           @db.VarChar()
+  birthDate         String?           @db.VarChar(20)
+  birthPlace        String?           @db.VarChar(80)
+  birthState        String?           @db.VarChar(80)
+  curp              String?           @db.VarChar(40)
+  rfc               String?           @db.VarChar(40)
+  militaryCard      String?           @db.VarChar(40)
+  issstep           String?           @db.VarChar(20)
+  gender            String?           @db.VarChar(10)
+  maritalStatus     String?           @db.VarChar(10)
+  phone             String?           @db.VarChar(15)
+  mobile            String?           @db.VarChar(15)
+  email             String?           @unique @db.VarChar(100)
+  institucionalMail String?           @db.VarChar(100)
+  address           String?           @db.VarChar(80)
+  addressNumber     String?           @db.VarChar(11)
+  colony            String?           @db.VarChar(80)
+  population        String?           @db.VarChar(80)
+  postalCode        String?           @db.VarChar(11)
+  photo             String?           @db.VarChar(255)
+  degree            String?           @db.VarChar(80)
+  title             String?           @db.VarChar(80)
+  titleComplete     String?           @db.VarChar(80)
+  active            Boolean           @db.Boolean
+  partialTemplates  PartialTemplate[]
+  users             Users?
+
+  @@unique([id, ide])
+}
+
+model PartialTemplate {
+  id         Int     @id @unique @default(autoincrement())
+  nt         Int     @unique @db.Integer
+  name       String  @db.VarChar(255)
+  gender     String? @db.VarChar(10)
+  position   String  @db.VarChar(120)
+  total      Int     @db.Integer
+  status     String  @default("pendiente") @db.VarChar(50)
+  year       String  @db.VarChar(4)
+  period     String  @db.VarChar(10)
+  templateId BigInt  @unique
+
+  personalData PersonalData @relation(fields: [nt], references: [ide])
+  template     Template     @relation(fields: [templateId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  activities   Activity[]
+  comments     Comments[]
+}
+
+model Comments {
+  id                BigInt          @id @unique @default(autoincrement())
+  createAt          DateTime        @default(now())
+  comment           String          @db.VarChar(200)
+  partialtemplateId Int             @unique
+  partialTemplate   PartialTemplate @relation(fields: [partialtemplateId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
+
+model Activity {
+  id                     String   @id @unique
+  educationalProgramId   BigInt?  @unique
+  partialTemplateId      Int?     @unique
+  activityDistribution   String?  @db.VarChar(120)
+  managmentType          String?  @db.VarChar(120)
+  stayType               String?  @db.VarChar(120)
+  activityName           String?  @db.VarChar(120)
+  gradeGroups            String[] @db.VarChar(50)
+  weeklyHours            Int?     @db.Integer
+  subtotalClassification Int?     @db.Integer
+  numberStudents         Int?     @db.Integer
+
+  partialTemplate    PartialTemplate?     @relation(fields: [partialTemplateId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  educationalProgram EducationalPrograms? @relation(fields: [educationalProgramId], references: [id])
+}
+
+model Template {
+  id              BigInt            @id @unique @default(autoincrement())
+  state           String            @default("pendiente") @db.VarChar(50)
+  areaId          BigInt
+  period          String            @db.VarChar(50)
+  responsibleId   Int
+  revisedById     Int
+  area            Area              @relation(fields: [areaId], references: [id])
+  responsible     Users             @relation("responsable", fields: [responsibleId], references: [nt], onUpdate: Cascade, onDelete: NoAction)
+  revisedBy       Users             @relation("Revisado por", fields: [revisedById], references: [nt], onUpdate: Cascade, onDelete: NoAction)
+  partialTemplate PartialTemplate[]
+}
+
+model Area {
+  id   BigInt @id @unique @default(autoincrement())
+  name String @unique @db.VarChar(120)
+
+  template            Template[]
+  educationalPrograms EducationalPrograms[]
+}
+
+model EducationalPrograms {
+  id           BigInt  @id @unique @default(autoincrement())
+  abbreviation String @db.VarChar(20)
+  description  String @db.VarChar(255)
+
+  areaId     BigInt
+  area       Area      @relation(fields: [areaId], references: [id], onUpdate: Cascade)
+  activities Activity[]
+  subjects   Subject[]
+}
+
+model Subject {
+  id                   BigInt              @id @unique @default(autoincrement())
+  educationalProgramId BigInt
+  weeklyHours          Int                 @db.Integer
+  totalHours           Int                 @db.Integer
+  monthPeriod          String              @db.VarChar(10)
+  subjectName          String              @db.VarChar(120)
+  educationalProgram   EducationalPrograms @relation(fields: [educationalProgramId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+}
